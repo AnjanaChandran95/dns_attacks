@@ -24,3 +24,4 @@ def spoof_dns(pkt):
 iface = "br-233f3ca0592c"
 print(f"[*] Listening for DNS queries on interface: {iface}")
 sniff(filter="udp port 53", iface=iface, prn=spoof_dns)
+
