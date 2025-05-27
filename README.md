@@ -1,4 +1,7 @@
- Local DNS Attack Lab
+# Local DNS Attack Lab
+
+## Github : https://github.com/AnjanaChandran95/dns_attacks/tree/feat/anjana
+
 
 ## Task 1: Directly Spoofing DNS Response to User
 
@@ -58,7 +61,7 @@ sniff(filter="udp port 53", iface=iface, prn=spoof_dns)
 
 The script listens for DNS queries to www.example.com and responds with a forged answer 1.2.3.4. This script exploits the time gap between a user’s query and the legitimate response.
 
- #Expected Result
+Expected Result
 
 When the victim runs:
 ```bash
@@ -108,13 +111,13 @@ This task demonstrated a successful DNS spoofing attack in a local network. The 
 
 # Task 2: DNS Cache Poisoning Attack
 
-# Objective
+Objective
 
 The goal of this task is to perform a **DNS cache poisoning attack** on a local DNS server (`10.9.0.53`) within a controlled lab environment. The attacker spoofs a DNS response and sends it to the DNS server before the legitimate one arrives, causing the server to cache the forged information.
 
 ---
 
-# Environment
+Environment
 
 - **User Machine:** `hostA` (10.9.0.5)
 - **Attacker:** `seed-attacker` (host mode)
@@ -127,13 +130,13 @@ The lab setup was configured using Docker Compose and shared volumes (`./volumes
 
 ##Setup Steps
 
-# 1. Flush DNS Cache
+ 1. Flush DNS Cache
 Run inside `local-dns-server` container:
 ```bash
 rndc flush
 ```
 
-# 2. Introduce Network Delay
+ 2. Introduce Network Delay
 Inside `seed-router` container:
 ```bash
 tc qdisc del dev eth0 root
@@ -141,7 +144,7 @@ tc qdisc add dev eth0 root netem delay 150ms
 tc qdisc show dev eth0
 ```
 
-# 3. Run the Attack Script
+ 3. Run the Attack Script
 Inside `seed-attacker` container:
 ```bash
 cd /volumes
@@ -161,7 +164,7 @@ Inside `hostA` container:
 dig www.example.com
 ```
 
-# 5. Verify Cache Status
+ 5. Verify Cache Status
 Re-run the dig **after stopping the attacker script**:
 ```bash
 dig www.example.com
@@ -185,7 +188,7 @@ This confirms that the DNS server accepted and cached the spoofed entry for www.
 once attacket script was stopped no valid response was available .
 
 
-# Results
+ Results
 
 - The attacker successfully intercepted the query and sent a spoofed DNS response.
 - The user machine (`hostA`) received the fake IP (`1.2.3.4`) from the local DNS server.
@@ -224,15 +227,15 @@ sniff(iface=iface, filter=f, prn=spoof_dns)
 ```
 .....................................................................................................................................................................................................................................
 
-# SEED Labs – Task 3: Spoofing NS Records (DNS Cache Poisoning)
+#  Task 3: Spoofing NS Records (DNS Cache Poisoning)
 
-# Objective
+Objective
 
 This task demonstrates a more impactful DNS cache poisoning attack where the attacker spoofs a **Name Server (NS)** record for the entire domain (`example.com`). By injecting a forged NS record, all future queries to subdomains under `example.com` (e.g., `mail.example.com`, `ftp.example.com`) will be redirected to the attacker's malicious nameserver (`ns.attacker32.com`).
 
 ---
 
-# Environment
+ Environment
 
 - **User Machine:** `hostA` (10.9.0.5)
 - **Attacker:** `seed-attacker`
@@ -241,20 +244,20 @@ This task demonstrates a more impactful DNS cache poisoning attack where the att
 
 ---
 
-# Setup Steps
+Setup Steps
 
 # 1. Flush DNS Cache
 ```bash
 rndc flush
 ```
 
-# 2. Apply Network Delay on Router
+2. Apply Network Delay on Router
 ```bash
 tc qdisc del dev eth0 root
 tc qdisc add dev eth0 root netem delay 150ms
 ```
 
-### 3. Run the Spoofing Script
+3. Run the Spoofing Script
 Inside `seed-attacker` container:
 ```bash
 cd /volumes
@@ -268,7 +271,7 @@ The script listens for DNS queries to `example.com`, and responds with:
 
 ![alt text](image-4.png)
 
-### 4. Trigger DNS Queries from User
+4. Trigger DNS Queries from User
 From `hostA`:
 ```bash
 dig www.example.com
@@ -278,14 +281,14 @@ dig ftp.example.com
 ![alt text](image-5.png)
 ---
 
-##  Results
+ Results
 
 Each query to a subdomain of `example.com` returned:
 
 - A fake IP (`1.2.3.4`)
 - An NS record pointing to the attacker-controlled nameserver
 
-### Example Output:
+ Example Output:
 ```text
 ;; ANSWER SECTION:
 www.example.com. 259200 IN A 1.2.3.4
@@ -332,15 +335,15 @@ print("[*] Listening for DNS queries on interface:", iface)
 sniff(iface=iface, filter=f, prn=spoof_dns)
 
 ......................................................................................................................................................................................................................................
-#  SEED Labs – Task 4: Spoofing NS Records for Another Domain
+#   Task 4: Spoofing NS Records for Another Domain
 
-# Objective
+Objective
 
 In this task, we extended the DNS cache poisoning attack from Task 3. Instead of targeting only `example.com`, we modified the spoofed response to also poison the NS record for another unrelated domain: `google.com`. This means any queries to `google.com` will now be resolved through the attacker-controlled nameserver.
 
 ---
 
-## Environment
+ Environment
 
 - **User Machine:** `hostA` (10.9.0.5)
 - **Attacker:** `seed-attacker`
@@ -349,20 +352,20 @@ In this task, we extended the DNS cache poisoning attack from Task 3. Instead of
 
 ---
 
-# Setup Steps
+ Setup Steps
 
-### 1. Flush the DNS Cache
+ 1. Flush the DNS Cache
 ```bash
 rndc flush
 ```
 
-### 2. Apply Network Delay on Router
+2. Apply Network Delay on Router
 ```bash
 tc qdisc del dev eth0 root
 tc qdisc add dev eth0 root netem delay 150ms
 ```
 
-### 3. Run the Spoofing Script
+3. Run the Spoofing Script
 Inside `seed-attacker` container:
 ```bash
 cd /volumes
@@ -374,7 +377,7 @@ The script spoofs responses to queries for `www.example.com` and injects forged 
 - `example.com`
 - `google.com`
 
-### 4. Trigger DNS Queries from User
+ 4. Trigger DNS Queries from User
 ```bash
 dig www.example.com
 dig www.google.com
@@ -382,9 +385,9 @@ dig www.google.com
 ![alt text](image-7.png)
 ---
 
-# Results
+ Results
 
-### 🔹 Output from `dig www.example.com`:
+ Output from `dig www.example.com`:
 ```
 ;; ANSWER SECTION:
 www.example.com. 259200 IN A 1.2.3.4
@@ -394,7 +397,7 @@ example.com. 259200 IN NS ns.attacker32.com.
 google.com.  259200 IN NS ns.attacker32.com.
 ```
 
-# Output from `dig www.google.com`:
+ Output from `dig www.google.com`:
 ```
 ;; connection timed out; no servers could be reached
 ```
@@ -437,15 +440,15 @@ print("[*] Listening for DNS queries on interface:", iface)
 sniff(iface=iface, filter=f, prn=spoof_dns)
 
 ......................................................................................................................................................................................................................................
-# SEED Labs – Task 5: Spoofing Records in the Additional Section
+#  Task 5: Spoofing Records in the Additional Section
 
-# Objective
+Objective
 
 In this task, we attempted to poison the DNS cache by spoofing records in the **Additional Section** of a DNS response. This section is commonly used to provide A records for names that appear in the **Authority Section**, potentially helping the resolver avoid separate lookups.
 
 ---
 
-# Environment
+ Environment
 
 - **User Machine:** `hostA` (10.9.0.5)
 - **Attacker:** `seed-attacker`
@@ -454,23 +457,23 @@ In this task, we attempted to poison the DNS cache by spoofing records in the **
 
 
 
-# Spoofed DNS Response Details
+ Spoofed DNS Response Details
 
-# Authority Section:
+ Authority Section:
 ```
 example.com.       IN NS   ns.attacker32.com.
 example.com.       IN NS   ns.example.com.
 ```
 
 
-### Additional Section:
+ Additional Section:
 ```
 ns.attacker32.com. IN A    1.2.3.4
 ns.example.net.    IN A    5.6.7.8
 www.facebook.com.  IN A    3.4.5.6
 ```
 
-### Trigger:
+ Trigger:
 A DNS query for `www.example.com` from `hostA` initiates the spoof.
 
 ---
@@ -478,7 +481,7 @@ A DNS query for `www.example.com` from `hostA` initiates the spoof.
 ![alt text](image-10.png)
 
 
-# Observed Results
+ Observed Results
 
 - The spoofed packet was accepted, and all three additional A records were shown in the `dig` output from `hostA`.
 - However, **none of the A records in the Additional Section were cached** on the local DNS server.
@@ -538,5 +541,8 @@ iface = "br-233f3ca0592c"
 f = "udp and dst port 53"
 print("[*] Listening for DNS queries on interface:", iface)
 sniff(iface=iface, filter=f, prn=spoof_dns)
+
+
+Github repo link 
 .....................................................................................................................................................................................................................................
 
