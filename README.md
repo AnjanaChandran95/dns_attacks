@@ -58,24 +58,8 @@ sniff(filter="udp port 53", iface=iface, prn=spoof_dns)
 
 The script listens for DNS queries to www.example.com and responds with a forged answer 1.2.3.4. This script exploits the time gap between a user’s query and the legitimate response.
 
- #Expected Result
 
-When the victim runs:
-```bash
-dig www.example.com
-```
-
-The expected output should be:
-```
-;; ANSWER SECTION:
-www.example.com. 259200 IN A 1.2.3.4
-```
-
-Indicating the spoofed response was accepted before the legitimate one.
-
----
-
-Actual Result
+Result
 
 ![alt text](screenshots/image1.png)
 
@@ -285,16 +269,6 @@ Each query to a subdomain of `example.com` returned:
 - A fake IP (`1.2.3.4`)
 - An NS record pointing to the attacker-controlled nameserver
 
-### Example Output:
-```text
-;; ANSWER SECTION:
-www.example.com. 259200 IN A 1.2.3.4
-
-;; AUTHORITY SECTION:
-example.com. 259200 IN NS ns.attacker32.com.
-```
-
-This confirms that the NS spoof was successful and cached by the DNS server.
 
 ![alt text](image-13.png)
 
@@ -456,7 +430,6 @@ In this task, we attempted to poison the DNS cache by spoofing records in the **
 
 # Spoofed DNS Response Details
 
-# Authority Section:
 ```
 example.com.       IN NS   ns.attacker32.com.
 example.com.       IN NS   ns.example.com.
